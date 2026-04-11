@@ -1,0 +1,27 @@
+---
+- name: Recopilar información del sistema
+  hosts: linux
+  tasks:
+    - name: Obtener uptime
+      command: uptime
+      register: uptime_output
+
+    - name: Mostrar uptime
+      debug:
+        msg: "{{ uptime_output.stdout }}"
+
+    - name: Obtener uso de disco
+      command: df -h
+      register: disco_output
+
+    - name: Mostrar uso de disco
+      debug:
+        msg: "{{ disco_output.stdout_lines }}"
+
+    - name: Obtener memoria
+      command: free -h
+      register: memoria_output
+
+    - name: Mostrar memoria
+      debug:
+        msg: "{{ memoria_output.stdout_lines }}"
