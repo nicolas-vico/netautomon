@@ -1,0 +1,27 @@
+---
+- name: Recopilar información de red
+  hosts: linux
+  tasks:
+    - name: Interfaces de red
+      command: ip addr show
+      register: interfaces
+
+    - name: Mostrar interfaces
+      debug:
+        msg: "{{ interfaces.stdout_lines }}"
+
+    - name: Tabla de rutas
+      command: ip route show
+      register: rutas
+
+    - name: Mostrar rutas
+      debug:
+        msg: "{{ rutas.stdout_lines }}"
+
+    - name: Conexiones activas
+      command: ss -tunap
+      register: conexiones
+
+    - name: Mostrar conexiones
+      debug:
+        msg: "{{ conexiones.stdout_lines }}"
