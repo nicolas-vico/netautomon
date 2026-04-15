@@ -1,0 +1,15 @@
+---
+- name: Actualizar sistema
+  hosts: linux
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Actualizar paquetes instalados
+      apt:
+        upgrade: yes
+
+    - name: Eliminar paquetes innecesarios
+      apt:
+        autoremove: yes
