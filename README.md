@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=flat-square&logo=python)
 ![Ansible](https://img.shields.io/badge/Ansible-2.10-red?style=flat-square&logo=ansible)
 ![Zabbix](https://img.shields.io/badge/Zabbix-7.0-CC0000?style=flat-square)
-![Grafana]![alt text](image.png)
+![Grafana](https://img.shields.io/badge/Grafana-10.x-F46800?style=flat-square&logo=grafana)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 > **Final Year Project** · Higher Degree in Telecommunications and Computer Systems
