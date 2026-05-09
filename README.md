@@ -27,6 +27,28 @@ The platform runs on an Ubuntu Server 22.04 LTS virtual machine and is structure
 
 ---
 
+## 📸 Screenshots
+
+### Grafana — Node Exporter Full Dashboard
+![Grafana Dashboard](docs/screenshots/grafana_dashboard.png)
+
+### Python — Connectivity Check
+![Ping Check](docs/screenshots/ping_check.png)
+
+### Python — Automated Backup
+![Backup Config](docs/screenshots/backup_config.png)
+
+### Ansible — System Info Playbook
+![Ansible Playbook](docs/screenshots/ansible_playbook.png)
+
+### Zabbix — Monitored Hosts
+![Zabbix Hosts](docs/screenshots/zabbix_hosts.png)
+
+### Telegram — Automated Alert
+![Telegram Alert](docs/screenshots/telegram_alert.png)
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -69,7 +91,8 @@ netautomon/
 │       ├── info_red.yml       # Gather interfaces, routes and connections
 │       └── actualizar_sistema.yml  # Automated system update
 ├── backups/                   # Generated backups (excluded from Git)
-├── docs/                      # Additional documentation
+├── docs/
+│   └── screenshots/           # Project screenshots
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -170,17 +193,6 @@ apt install -y cacti cacti-spine
 
 ```bash
 python3 scripts/ping_check.py
-```
-
-Expected output:
-```
-Device                    IP                 Status
--------------------------------------------------------
-UDM-SE                    172.16.90.1        ✓ UP
-UAP-AC-1                  172.16.90.2        ✓ UP
-UAP-AC-2                  172.16.90.3        ✓ UP
-Proxmox                   172.16.90.50       ✓ UP
-VM-NetAutoMon             172.16.90.54       ✓ UP
 ```
 
 ### Python — Configuration backup
