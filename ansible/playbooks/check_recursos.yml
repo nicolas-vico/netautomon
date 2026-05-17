@@ -1,0 +1,70 @@
+---
+- name: Informe de recursos del sistema
+  hosts: linux
+  gather_facts: true
+
+  vars:
+    umbral_cpu: 80
+    umbral_ram: 85
+    umbral_disco: 80
+
+  tasks:
+    - name: Obtener uso de CPU (%)
+      shell: top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8}' | cut -d. -f1
+      register: cpu_uso
+      changed_when: false
+
+    - name: Obtener RAM total y disponible (MB)
+      shell: free -m | awk 'NR==2{printf "%s %s %s", $2, $3, int($3*100/$2)}'
+      register: ram_info
+      changed_when: false
+
+    - name: Obtener uso de disco raíz (%)
+      shell: df / | awk 'NR==2{print $5}' | tr -d '%'
+      register: disco_uso
+      changed_when: false
+
+    - name: Obtener disco total y usado
+      shell: df -h / | awk 'NR==2{printf "%s usado de %s", $3, $2}'
+      register: disco_info
+      changed_when: false
+
+    - name: Obtener uptime
+      shell: uptime -p
+      register: uptime_info
+      changed_when: false
+
+    - name: Mostrar informe de recursos
+      debug:
+        msg:
+          - "══════════════════════════════════════════"
+          - "  INFORME DE RECURSOS — {{ inventory_hostname }}"
+          - "══════════════════════════════════════════"
+          - "  Uptime   : {{ uptime_info.stdout }}"
+          - "  CPU      : {{ cpu_uso.stdout }}%  {{ '⚠ ALTO' if cpu_uso.stdout | int > umbral_cpu else '✓ OK' }}"
+          - "  RAM      : {{ ram_info.stdout.split()[2] }}% usado ({{ ram_info.stdout.split()[1] }}MB / {{ ram_info.stdout.split()[0] }}MB)  {{ '⚠ ALTO' if ram_info.stdout.split()[2] | int > umbral_ram else '✓ OK' }}"
+          - "  Disco /  : {{ disco_uso.stdout }}% ({{ disco_info.stdout }})  {{ '⚠ ALTO' if disco_uso.stdout | int > umbral_disco else '✓ OK' }}"
+          - "══════════════════════════════════════════"
+
+    - name: Generar alerta si CPU alta
+      debug:
+        msg: "🚨 ALERTA: CPU al {{ cpu_uso.stdout }}% en {{ inventory_hostname }} — supera el umbral del {{ umbral_cpu }}%"
+      when: cpu_uso.stdout | int > umbral_cpu
+
+    - name: Generar alerta si RAM alta
+      debug:
+        msg: "🚨 ALERTA: RAM al {{ ram_info.stdout.split()[2] }}% en {{ inventory_hostname }} — supera el umbral del {{ umbral_ram }}%"
+      when: ram_info.stdout.split()[2] | int > umbral_ram
+
+    - name: Generar alerta si disco alto
+      debug:
+        msg: "🚨 ALERTA: Disco al {{ disco_uso.stdout }}% en {{ inventory_hostname }} — supera el umbral del {{ umbral_disco }}%"
+      when: disco_uso.stdout | int > umbral_disco
+
+    - name: Guardar informe en fichero local
+      local_action:
+        module: lineinfile
+        path: "informe_recursos_{{ ansible_date_time.date }}.txt"
+        line: "{{ inventory_hostname }} | CPU: {{ cpu_uso.stdout }}% | RAM: {{ ram_info.stdout.split()[2] }}% | Disco: {{ disco_uso.stdout }}% | {{ ansible_date_time.time }}"
+        create: true
+      changed_when: false

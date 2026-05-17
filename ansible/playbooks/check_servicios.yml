@@ -1,0 +1,57 @@
+---
+- name: Verificar y recuperar servicios críticos
+  hosts: linux
+  gather_facts: false
+
+  vars:
+    servicios_criticos:
+      - name: zabbix-server
+        descripcion: "Zabbix Server"
+      - name: zabbix-agent
+        descripcion: "Zabbix Agent"
+      - name: prometheus
+        descripcion: "Prometheus"
+      - name: grafana-server
+        descripcion: "Grafana"
+      - name: apache2
+        descripcion: "Apache2 (Zabbix/Cacti web)"
+      - name: mysql
+        descripcion: "MySQL (base de datos Zabbix)"
+      - name: cron
+        descripcion: "Cron (Cacti poller)"
+
+  tasks:
+    - name: Comprobar estado de cada servicio
+      systemd:
+        name: "{{ item.name }}"
+      register: estado_servicios
+      loop: "{{ servicios_criticos }}"
+      ignore_errors: true
+
+    - name: Mostrar resumen de servicios
+      debug:
+        msg: >-
+          {{ '✓ OK    ' if item.status.ActiveState == 'active' else '✗ CAÍDO' }}
+          | {{ item.item.descripcion }} ({{ item.item.name }})
+      loop: "{{ estado_servicios.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+
+    - name: Reiniciar servicios caídos automáticamente
+      systemd:
+        name: "{{ item.item.name }}"
+        state: started
+      when: item.status.ActiveState != 'active'
+      loop: "{{ estado_servicios.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      register: reiniciados
+      ignore_errors: true
+
+    - name: Confirmar servicios recuperados
+      debug:
+        msg: "🔄 Reiniciado: {{ item.item.item.descripcion }} ({{ item.item.item.name }})"
+      when: item.changed
+      loop: "{{ reiniciados.results }}"
+      loop_control:
+        label: "{{ item.item.item.name }}"
