@@ -29,6 +29,16 @@ if [[ "$OS" != "22.04" && "$OS" != "24.04" ]]; then
   warn "This script is tested on Ubuntu 22.04 and 24.04. Detected: $OS"
 fi
 
+# ── Request a database password without storing it in the repository ─
+if [ -z "${ZABBIX_DB_PASSWORD:-}" ]; then
+  read -r -s -p "Enter a new Zabbix database password: " ZABBIX_DB_PASSWORD
+  echo ""
+fi
+
+if [[ ! "$ZABBIX_DB_PASSWORD" =~ ^[A-Za-z0-9._@%+=-]{12,128}$ ]]; then
+  error "Use 12-128 characters: letters, numbers, dot, underscore, @, %, +, = or -."
+fi
+
 echo ""
 echo -e "${CYAN}"
 echo "  _   _      _   _         _        __  __"
@@ -89,16 +99,16 @@ log "Zabbix 7.0 installed"
 # ── Step 7: Zabbix DB setup ───────────────────────────────────
 header "Step 7 — Zabbix database"
 mysql -uroot -e "CREATE DATABASE IF NOT EXISTS zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;" 2>/dev/null
-mysql -uroot -e "CREATE USER IF NOT EXISTS 'zabbix'@'localhost' IDENTIFIED WITH mysql_native_password BY 'zabbix123';" 2>/dev/null
+mysql -uroot -e "CREATE USER IF NOT EXISTS 'zabbix'@'localhost' IDENTIFIED WITH mysql_native_password BY '${ZABBIX_DB_PASSWORD}';" 2>/dev/null
 mysql -uroot -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';" 2>/dev/null
 mysql -uroot -e "SET GLOBAL log_bin_trust_function_creators = 1;" 2>/dev/null
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pzabbix123 zabbix 2>/dev/null
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | MYSQL_PWD="$ZABBIX_DB_PASSWORD" mysql --default-character-set=utf8mb4 -uzabbix zabbix 2>/dev/null
 mysql -uroot -e "SET GLOBAL log_bin_trust_function_creators = 0;" 2>/dev/null
-sed -i 's/# DBPassword=/DBPassword=zabbix123/' /etc/zabbix/zabbix_server.conf
+sed -i "s|^# DBPassword=.*|DBPassword=${ZABBIX_DB_PASSWORD}|" /etc/zabbix/zabbix_server.conf
 locale-gen en_US.UTF-8 > /dev/null
 systemctl enable zabbix-server zabbix-agent apache2 --quiet
 systemctl restart zabbix-server zabbix-agent apache2
-log "Zabbix database configured (user: zabbix / pass: zabbix123)"
+log "Zabbix database configured for user zabbix"
 
 # ── Step 8: Cacti ─────────────────────────────────────────────
 header "Step 8 — Cacti"
@@ -115,13 +125,14 @@ log "SSH known_hosts configured"
 header "Installation complete!"
 echo -e "  ${GREEN}Services running:${NC}"
 echo -e "  • Prometheus  → http://$(hostname -I | awk '{print $1}'):9090"
-echo -e "  • Grafana     → http://$(hostname -I | awk '{print $1}'):3000  (admin/admin)"
-echo -e "  • Zabbix      → http://$(hostname -I | awk '{print $1}')/zabbix  (Admin/zabbix)"
-echo -e "  • Cacti       → http://$(hostname -I | awk '{print $1}')/cacti  (admin/admin)"
+echo -e "  • Grafana     → http://$(hostname -I | awk '{print $1}'):3000  (change the default login immediately)"
+echo -e "  • Zabbix      → http://$(hostname -I | awk '{print $1}')/zabbix  (change the default login immediately)"
+echo -e "  • Cacti       → http://$(hostname -I | awk '{print $1}')/cacti  (complete setup and set a unique password)"
 echo ""
 echo -e "  ${YELLOW}Next steps:${NC}"
-echo -e "  1. Edit inventory/hosts.yml with your device IPs and credentials"
-echo -e "  2. Edit ansible/inventory/hosts.ini with your hosts"
-echo -e "  3. Run: python3 scripts/ping_check.py"
-echo -e "  4. Import Grafana dashboard ID 1860 (Node Exporter Full)"
+echo -e "  1. Copy inventory/hosts.example.yml to inventory/hosts.yml and adapt the IPs"
+echo -e "  2. Copy ansible/inventory/hosts.example.ini to ansible/inventory/hosts.ini"
+echo -e "  3. Configure SSH keys or Ansible Vault; do not store passwords in inventories"
+echo -e "  4. Run: python3 scripts/ping_check.py"
+echo -e "  5. Import Grafana dashboard ID 1860 (Node Exporter Full)"
 echo ""

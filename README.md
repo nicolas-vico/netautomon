@@ -109,7 +109,7 @@ I was not trying to replace administrators with one enormous script. When I repe
 
 ### Python and Netmiko
 
-[`ping_check.py`](scripts/ping_check.py) reads [`inventory/hosts.yml`](inventory/hosts.yml), sends one ICMP request to each device and prints a simple UP/DOWN table.
+[`ping_check.py`](scripts/ping_check.py) reads a local `inventory/hosts.yml`, created from [`inventory/hosts.example.yml`](inventory/hosts.example.yml), sends one ICMP request to each device and prints a simple UP/DOWN table.
 
 ![Connectivity check against the lab inventory](docs/screenshots/ping_check.png)
 
@@ -183,6 +183,9 @@ The scripts require Python 3.10 or newer and the packages in [`requirements.txt`
 git clone https://github.com/nicolas-vico/netautomon.git
 cd netautomon
 
+cp inventory/hosts.example.yml inventory/hosts.yml
+cp ansible/inventory/hosts.example.ini ansible/inventory/hosts.ini
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -191,11 +194,11 @@ python3 scripts/ping_check.py
 python3 scripts/backup_config.py
 ```
 
-Before running them, adapt `inventory/hosts.yml` to your environment. The backup script currently supports Linux hosts that accept SSH connections.
+Before running them, adapt the local `inventory/hosts.yml` to your environment. The backup script supports Linux hosts that accept SSH connections. It uses SSH keys and the username from the inventory by default; `NETAUTOMON_SSH_USERNAME`, `NETAUTOMON_SSH_KEY_FILE` and `NETAUTOMON_SSH_PASSWORD` can provide local overrides without committing secrets.
 
 ### Ansible playbooks
 
-Adapt `ansible/inventory/hosts.ini`, confirm connectivity and then run only the playbook you need. Some playbooks update packages or start services, so they should not be launched blindly.
+Copy and adapt the example inventory, configure SSH keys or Ansible Vault, confirm connectivity and then run only the playbook you need. Some playbooks update packages or start services, so they should not be launched blindly.
 
 ```bash
 ansible all -i ansible/inventory/hosts.ini -m ping
@@ -209,7 +212,7 @@ ansible-playbook -i ansible/inventory/hosts.ini \
 
 ### Bootstrap script
 
-`setup.sh` was written for a clean Ubuntu 22.04/24.04 lab host. It updates the operating system, installs packages and configures several services and a local database. Read it before use and do not treat it as a production installer.
+`setup.sh` was written for a clean Ubuntu 22.04/24.04 lab host. It updates the operating system, installs packages and configures several services and a local database. It requests a new Zabbix database password without storing it in the repository. Read it before use and do not treat it as a production installer.
 
 ```bash
 sudo bash setup.sh

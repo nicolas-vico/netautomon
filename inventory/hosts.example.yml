@@ -17,24 +17,29 @@ devices:
   - name: Proxmox
     ip: 172.16.90.50
     type: linux
+    username: netadmin
     services: [hypervisor]
 
   - name: VM-Asterisk-Unai
     ip: 172.16.90.51
     type: linux
+    username: netadmin
     services: [voip]
 
   - name: VM-Asterisk-Ariel
     ip: 172.16.90.52
     type: linux
+    username: netadmin
     services: [voip]
 
   - name: VM-PiHole-Alex
     ip: 172.16.90.53
     type: linux
+    username: netadmin
     services: [dns]
 
   - name: VM-NetAutoMon
     ip: 172.16.90.54
     type: linux
+    username: netadmin
     services: [monitoring, automation]

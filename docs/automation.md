@@ -23,11 +23,11 @@ The operator remained in control of every action. None of these tools was trigge
 
 ## Python inventory
 
-Both Python scripts read `inventory/hosts.yml`. Each entry contains a device name, private IP address, type and a short list of services. The lab inventory included the UDM-SE, access points, Proxmox host, Linux containers and the NetAutoMon container.
+Both Python scripts read a local `inventory/hosts.yml`, copied from the public `inventory/hosts.example.yml`. Each entry contains a device name, private IP address, type and a short list of services. The lab inventory included the UDM-SE, access points, Proxmox host, Linux containers and the NetAutoMon container.
 
 Keeping device data outside the scripts made it easier to change the inventory without editing the program logic. The original structure was useful, but it did not have schema validation. A missing `devices`, `name` or `ip` field currently causes an exception instead of a clear validation message.
 
-The public version will use an example inventory and external authentication. Real passwords must not be stored in YAML.
+The public version uses an example inventory and external authentication. Real passwords must not be stored in YAML.
 
 ## `ping_check.py`
 
@@ -76,7 +76,7 @@ Another important boundary is Git. The script writes the text file; it does not 
 Current limitations include:
 
 - only Linux devices are selected;
-- the connection expects a username and password in the inventory;
+- the connection expects a username from the local inventory or environment, plus an SSH key or password supplied outside Git;
 - the backup directory must already exist;
 - the three commands capture network state, not application or system state;
 - filenames do not yet include time or a unique identifier;
@@ -154,7 +154,7 @@ This reduced the repetitive installation work, but it was not a complete restore
 The current script is also not ready to run blindly:
 
 - it executes as root and performs a full package upgrade;
-- it contains lab-oriented database credentials that must be removed;
+- it prompts for a database password, but still writes that secret into the local Zabbix configuration as the application requires;
 - some installation steps are not fully idempotent;
 - external repositories and packages are not pinned for reproducible builds;
 - there is no dry-run mode, rollback or post-installation test suite; and
@@ -201,7 +201,7 @@ Real SSH, SNMP and service-recovery checks will remain optional integration test
 
 My priority would be to make the existing automation safer and easier to verify rather than add another framework:
 
-1. remove credentials from versioned inventories and rotate any exposed lab credentials;
+1. keep credentials outside versioned inventories and remove the obsolete lab secret from Git history;
 2. add input validation and explicit configuration paths;
 3. create unit tests around the current Python behaviour;
 4. make snapshots unique and record a clear success/failure summary;
