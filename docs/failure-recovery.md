@@ -43,6 +43,8 @@ sequenceDiagram
 
 The recovery command was:
 
+The command below assumes that the public example inventory has first been copied to the ignored local file `ansible/inventory/hosts.ini` and adapted to the current lab.
+
 ```bash
 ansible-playbook -i ansible/inventory/hosts.ini \
   ansible/playbooks/check_servicios.yml
@@ -179,7 +181,7 @@ I did not measure a formal recovery time objective or recovery point objective d
 
 The next version should improve recovery in this order:
 
-1. remove secrets from Git and use SSH keys plus encrypted variables;
+1. rebuild the lab with individual accounts, SSH keys and encrypted variables from the beginning;
 2. export Grafana dashboards and alert definitions;
 3. back up Zabbix and Cacti databases plus their required configuration;
 4. record Prometheus retention decisions instead of assuming all history must be restored;

@@ -38,7 +38,7 @@ Zabbix was the broadest monitoring platform in the lab. I added the NetAutoMon h
 
 The NetAutoMon host exposed 43 agent metrics. The UDM-SE and each access point exposed 12 SNMP metrics in the configuration I used. This gave me one place to check whether the monitored systems were available and to inspect host or device data without connecting to each one individually.
 
-The installation also produced one of the less glamorous troubleshooting moments in the project. The first Zabbix version I tried did not fit cleanly with Ubuntu 24.04. I moved to Zabbix 7.0, which had official support for that Ubuntu release, and adjusted the MySQL authentication used by the lab installation. The result worked, although the database setup in `setup.sh` remains lab-oriented and will be changed before the script is treated as reusable.
+The installation also produced one of the less glamorous troubleshooting moments in the project. The first Zabbix version I tried did not fit cleanly with Ubuntu 24.04. I moved to Zabbix 7.0, which had official support for that Ubuntu release, and adjusted the MySQL authentication used by the lab installation. The result worked, although the database setup in `setup.sh` remains lab-oriented and would need further work before the script could be treated as reusable.
 
 Zabbix also provided the detection side of the Grafana failure demonstration. Stopping `grafana-server` created a service problem that Zabbix detected in under a minute. I then ran the Ansible service playbook manually and Zabbix confirmed that the service had returned. The monitoring event and the recovery action were separate; Zabbix did not automatically launch Ansible. The full sequence is documented in [Failure and Recovery](failure-recovery.md).
 

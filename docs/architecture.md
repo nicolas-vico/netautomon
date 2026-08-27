@@ -109,7 +109,7 @@ There were also several compromises that would not be acceptable in a production
 - Prometheus did not have its own authentication layer.
 - Monitoring, dashboards and application databases shared the same LXC container.
 
-The public repository will contain example inventories only. Real credentials do not belong in version control.
+The public repository contains example inventories only. Real credentials do not belong in version control.
 
 ## Failure domains
 
@@ -123,7 +123,7 @@ The simulated Grafana outage and the real storage failure are separated and anal
 
 I would not start by adding more tools. The first architectural improvements would address the weaknesses the project already exposed:
 
-1. move credentials out of inventories and use SSH keys plus encrypted variables;
+1. rebuild the lab with individual accounts, SSH keys and encrypted variables instead of the original password-based access;
 2. export dashboards, alert rules and monitoring configuration so they can be versioned;
 3. back up the Zabbix and Cacti databases and test their restoration;
 4. monitor NetAutoMon from a small external node so a complete container failure is still visible; and

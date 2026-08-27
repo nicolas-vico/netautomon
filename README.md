@@ -10,6 +10,8 @@
 
 NetAutoMon was my final project for the Higher Degree in Telecommunications and Computer Systems at IES Pacífico in Madrid. It was also the first project where I had enough freedom to decide what kind of engineer I wanted to become.
 
+> **Portfolio rework — August 2026:** I originally built and operated NetAutoMon during the 2025–2026 academic year as my final project. In August, I reorganised the repository for my public portfolio, checked the documentation against the surviving code and screenshots, and replaced lab-specific authentication data with safe examples. The recent commit dates therefore show when I prepared the portfolio version, not when I first built and operated the lab. Where original evidence no longer survives, the documentation says so rather than recreating it.
+
 I did not begin with a list of tools that I wanted to place on my CV. I began with a problem that bothered me: infrastructure work can become repetitive very quickly, configuration can be lost, and a service may fail quietly until somebody notices. Checking every device and service by hand did not feel like a good answer. Restarting everything whenever something behaved strangely did not feel like one either.
 
 During my traineeship at the Museo Nacional Thyssen-Bornemisza, I worked closely with an experienced systems technician who taught me to investigate before applying a quick fix. We looked at symptoms, connectivity, system state, configuration and logs, formed a possible explanation and then tested it. I was still a student and often did not know the solution, but I learned that not knowing the answer is different from not knowing how to look for it. That way of thinking followed me into this project.
@@ -68,7 +70,7 @@ flowchart TD
 
 WireGuard gave me remote access to the lab. From the NetAutoMon container, the monitoring tools used agents or SNMP, while the Python scripts and Ansible connected to Linux hosts through SSH.
 
-The physical layout, addressing, VLAN roles, service placement and communication paths will be documented in [Architecture](docs/architecture.md).
+The physical layout, addressing, VLAN roles, service placement and communication paths are documented in [Architecture](docs/architecture.md).
 
 ## Why four monitoring tools?
 
@@ -99,7 +101,7 @@ Getting the Telegram message working was not completely smooth. My first templat
 
 That problem represented much of the project. When an integration failed, I reduced it to the simplest version that worked, confirmed the complete path and only then added complexity again.
 
-The monitoring choices, collected metrics, SNMP setup, alert rule and screenshots will be explained in [Monitoring](docs/monitoring.md).
+The monitoring choices, collected metrics, SNMP setup, alert rule and screenshots are explained in [Monitoring](docs/monitoring.md).
 
 ## Automation I wrote
 
@@ -135,7 +137,7 @@ The playbooks cover tasks I had previously performed one host at a time:
 
 ![Ansible gathering system information from the NetAutoMon host](docs/screenshots/ansible_playbook.png)
 
-The scripts, inventories, playbooks, expected output and safety considerations will be covered in [Automation](docs/automation.md).
+The scripts, inventories, playbooks, expected output and safety considerations are covered in [Automation](docs/automation.md).
 
 ## Failure and recovery test
 
@@ -169,7 +171,7 @@ The lesson was simple: Git gave me back the files, but not the system. Code vers
 
 I did not want to finish by saying, “I can reinstall it manually next time.” Rebuilding exposed the slow, forgettable steps, so I converted part of them into `setup.sh`. It is limited, but it came from a problem I had experienced: do the work, understand where it hurts and automate what is repeatable.
 
-The simulated outage, evidence, recovery steps, real storage failure and post-incident lessons will be documented in [Failure and Recovery](docs/failure-recovery.md).
+The simulated outage, evidence, recovery steps, real storage failure and post-incident lessons are documented in [Failure and Recovery](docs/failure-recovery.md).
 
 ## Running the code
 
@@ -224,10 +226,10 @@ sudo bash setup.sh
 - the service-recovery playbook is launched by an operator;
 - the Python backup records Linux network state, not full device or application configuration;
 - monitoring databases, dashboards and alert definitions are not yet exported as code;
-- the bootstrap script is lab-oriented and needs stronger secret handling and idempotency; and
+- the bootstrap script is lab-oriented and still needs better idempotency, validation and operational secret handling; and
 - there are no automated tests yet.
 
-If I continue the project, I would first remove the remaining lab-specific authentication, move secrets to SSH keys or Vault and export the monitoring configuration. After that, I would build and test a proper restore procedure before connecting selected alerts to controlled remediation jobs. Prometheus SNMP Exporter would also let me put the router and Linux metrics in the same Grafana view.
+If I continue the project, I would rebuild a disposable lab using individual accounts, SSH keys and encrypted variables from the beginning, then export the monitoring configuration. After that, I would build and test a proper restore procedure before connecting selected alerts to controlled remediation jobs. Prometheus SNMP Exporter would also let me put the router and Linux metrics in the same Grafana view.
 
 ## What I learned
 

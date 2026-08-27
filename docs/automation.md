@@ -83,7 +83,7 @@ Current limitations include:
 - errors are printed per device, but there are no structured logs or final failure summary; and
 - the UDM-SE configuration is not exported.
 
-A safer version will use SSH keys or an external secret source, create its output directory explicitly, validate the inventory and produce unique files. I would keep Git commits manual until the generated content has been checked for credentials or other sensitive data.
+The public portfolio rework removed passwords from versioned inventories and supports SSH keys or authentication supplied outside Git. The next improvements would be to create the output directory explicitly, validate the inventory and produce unique files. I would keep Git commits manual until the generated content has been checked for credentials or other sensitive data.
 
 ## Ansible playbooks
 
@@ -131,7 +131,7 @@ If a unit is inactive, the playbook requests `state: started` and then reports t
 
 The playbook was run manually during the Grafana failure demonstration. Zabbix detected the outage, but a person still decided to execute Ansible. This distinction matters because automatic remediation needs safeguards: an allow-list, a maximum number of attempts, dependency checks, logging and a route to escalation when restarting does not fix the problem.
 
-The current playbook uses `ignore_errors` during service checks and recovery. That kept the lab run moving, but some failed module results may not contain the same `status` fields as successful results. We will add tests or validation and handle that case before describing the playbook as robust.
+The current playbook uses `ignore_errors` during service checks and recovery. That kept the lab run moving, but some failed module results may not contain the same `status` fields as successful results. If I continued the project, I would add validation for that case before describing the playbook as robust.
 
 ## `setup.sh`: bootstrap after the storage incident
 
@@ -182,9 +182,9 @@ sequenceDiagram
 
 The detection was automatic. The recovery command inside the playbook was automated. The decision and trigger remained manual. [Failure and Recovery](failure-recovery.md) documents the evidence and the distinction in more detail.
 
-## Tests the repository still needs
+## Tests I would add in a continued version
 
-The original project did not include automated tests. The next repository phase will add unit tests without requiring the physical lab:
+The original project did not include automated tests, and this portfolio rework preserves that boundary rather than presenting later test code as part of the lab. If I continued developing it, useful unit tests that would not require the physical environment include:
 
 - mock ICMP results for reachable and unreachable hosts;
 - validate missing or malformed inventory fields;
@@ -195,13 +195,13 @@ The original project did not include automated tests. The next repository phase 
 - run Bash syntax and ShellCheck against `setup.sh`; and
 - scan commits for secrets.
 
-Real SSH, SNMP and service-recovery checks will remain optional integration tests because they need a controlled target. A unit test should not stop Grafana on whichever machine happens to run it.
+Real SSH, SNMP and service-recovery checks would remain optional integration tests because they need a controlled target. A unit test should not stop Grafana on whichever machine happens to run it.
 
 ## What I would improve first
 
 My priority would be to make the existing automation safer and easier to verify rather than add another framework:
 
-1. keep credentials outside versioned inventories and remove the obsolete lab secret from Git history;
+1. rebuild any future lab with individual accounts, SSH keys and encrypted variables from the beginning;
 2. add input validation and explicit configuration paths;
 3. create unit tests around the current Python behaviour;
 4. make snapshots unique and record a clear success/failure summary;
