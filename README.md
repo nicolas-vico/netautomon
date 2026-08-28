@@ -243,7 +243,7 @@ It also gave me a clear list of gaps to work on next. I have hands-on Linux expe
 CCNA · Telecommunications and Computer Systems (EQF Level 5)<br>
 Based in Zürich, Switzerland
 
-[LinkedIn](https://www.linkedin.com/in/nicolas-vico/) · [GitHub](https://github.com/nicolas-vico)
+[LinkedIn](https://www.linkedin.com/in/nicovico/) · [GitHub](https://github.com/nicolas-vico)
 
 ## License
 
